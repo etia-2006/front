@@ -124,15 +124,15 @@
       <h1>რეგისტრაცია</h1>
       <form onsubmit="return handleSubmit()">
         <div class="input-box">
-            <input type="fullname" name="fullname" placeholder="სახელი და გვარი" required>
+            <input type="text" name="fullname" placeholder="სახელი და გვარი" required>
             <i class='bx bx-user'></i>
           </div>
         <div class="input-box">
-          <input type="age" name="age"  placeholder="ასაკი" required>
+          <input type="number" name="age"  placeholder="ასაკი" required>
           <i class='bx bx-calendar'></i>
         </div>
         <div class="input-box">
-          <input type="phone" name="phone" placeholder="ტელეფონის ნომერი" required id="phone-number">
+          <input type="text" name="phone" placeholder="ტელეფონის ნომერი" required id="phone-number">
           <i class='bx bx-phone'></i>
         </div>
         <div class="input-box">
@@ -144,7 +144,7 @@
           <i class='bx bxs-lock-alt'></i>
         </div>
         <div class="input-box">
-          <input type="password" name="password" placeholder="დაადასტურეთ პაროლი" required>
+          <input type="password" name="confirm_password" placeholder="დაადასტურეთ პაროლი" required>
           <i class='bx bxs-check-shield'></i>
         </div>
         <button type="submit" name="submit" class="button">გაიარეთ რეგისტრაცია</button>
@@ -167,17 +167,69 @@
     }
 
     function handleSubmit() {
-      localStorage.setItem('registered', 'true');
-      window.location.href = "logo_animation.html"; 
-      return false; 
+      const formData = new FormData(document.querySelector('form'));
+      
+      const data = {
+        fullname: formData.get('fullname'),
+        age: formData.get('age'),
+        phone: formData.get('phone'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirm_password: formData.get('confirm_password')
+      };
+
+      fetch('http://localhost:5001/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          window.location.href = "logo_animation.html";
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+
+      return false;
     }
 
     function handleLogin() {
-      localStorage.setItem('registered', 'true'); 
-      window.location.href = "logo_animation.html"; 
-      return false; 
+      const formData = new FormData(document.querySelector('#login-form form'));
+      
+      const data = {
+        email: formData.get('email'),
+        password: formData.get('password')
+      };
+
+      // Send data to your backend for login (for example)
+      fetch('http://localhost:5001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('შესვლა წარმატებით განხორციელდა');
+          window.location.href = "home_front.html";
+        } else {
+          alert('მომხმარებელი ან პაროლი არასწორია');
+        }
+      })
+      .catch(error => console.error('Error:', error));
+
+      return false;
     }
-     document.querySelector('#phone-number').addEventListener('focus', function () {
+
+    document.querySelector('#phone-number').addEventListener('focus', function () {
       if (this.value === '') {
         this.value = '+995';
       }
@@ -185,3 +237,4 @@
   </script>
 </body>
 </html>
+
